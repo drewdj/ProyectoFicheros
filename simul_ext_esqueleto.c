@@ -28,10 +28,10 @@ void GrabarDatos(EXT_DATOS *memdatos, FILE *fich);
 
 int main()
 {
-	 char *comando[LONGITUD_COMANDO];
-	 char *orden[LONGITUD_COMANDO];
-	 char *argumento1[LONGITUD_COMANDO];
-	 char *argumento2[LONGITUD_COMANDO];
+	 char comando[LONGITUD_COMANDO];
+	 char orden[LONGITUD_COMANDO];
+	 char argumento1[LONGITUD_COMANDO];
+	 char argumento2[LONGITUD_COMANDO];
 	 
 	 int i,j;
 	 unsigned long int m;
@@ -48,7 +48,7 @@ int main()
      // Lectura del fichero completo de una sola vez
      //...
      
-     fent = fopen("particion.bin","r+b");
+     fent = fopen("D:\\Users\\Documents\\GitHub\\ProyectoFicheros\\particion.bin","r+b");
      fread(&datosfich, SIZE_BLOQUE, MAX_BLOQUES_PARTICION, fent);    
      
      
@@ -59,12 +59,14 @@ int main()
      memcpy(&memdatos,(EXT_DATOS *)&datosfich[4],MAX_BLOQUES_DATOS*SIZE_BLOQUE);
      
      // Buce de tratamiento de comandos
-     /*for (;;){
+     for (;;){
 		 do {
 		 printf (">> ");
 		 fflush(stdin);
-		 fgets(comando, LONGITUD_COMANDO, stdin);
-		 } while (ComprobarComando(comando,orden,argumento1,argumento2) !=0);
+       gets(comando);
+		} while (ComprobarComando(comando,orden,argumento1,argumento2) != 0);
+      printf("Saliste del bucle"); 
+       /*
 	     if (strcmp(orden,"dir")==0) {
             Directorio(&directorio,&ext_blq_inodos);
             continue;
@@ -84,5 +86,68 @@ int main()
             fclose(fent);
             return 0;
          }
-     }*/
+     */}
+}
+//Corregir esto para que sea paso por referencia
+int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2){
+   int flagArg1 = 0;
+   int flagArg2 = 0;
+   int flagArg3 = 0;
+   orden[0] = '\0';
+   argumento1[0] = '\0';
+   argumento2[0] = '\0';
+   int sizeOfComando = 0;
+   int numberOfSpace = 0;
+   while(strcomando[sizeOfComando] != '\0'){
+      if(strcomando[sizeOfComando] == ' '){
+         numberOfSpace++;
+      }
+      sizeOfComando++;
+   }
+   int flag = 0;
+   for(int i = 0; i < sizeOfComando; i++){
+      char filler = strcomando[i];
+      
+      if(filler == ' ' && flag == 0){
+         flag = 1;
+         continue;
+      }
+      else if(filler == ' ' && flag == 1){
+         flag = 2;
+         continue;
+      }
+      else if(flag == 0){
+         strcat(orden, &filler);
+      }
+      else if(flag == 1){
+         strcat(argumento1, &filler);
+      }
+      else if(flag == 2){
+         strcat(argumento2, &filler);
+      }
+      else{
+         break;
+      }
+   }
+   if(*orden != '\0'){
+      flagArg1 = 1;
+   }
+   if(*argumento1 != '\0'){
+      flagArg2 = 1;
+   }
+   if(*argumento2 != '\0'){
+      flagArg3 = 1;
+   }
+   if(flagArg1 == 1 && numberOfSpace == 0){
+      return 0;
+   }
+   if(flagArg1 == 1 && flagArg2 == 1 && numberOfSpace == 1){
+      return 0;
+   }
+   if(flagArg1 == 1 && flagArg2 == 1 && flagArg3 == 1){
+      return 0;
+   }
+   else {
+      return 1;
+   }
 }
