@@ -59,7 +59,7 @@ int main()
      memcpy(&memdatos,(EXT_DATOS *)&datosfich[4],MAX_BLOQUES_DATOS*SIZE_BLOQUE);
      
      // Buce de tratamiento de comandos
-     for (;;){
+     /*for (;;){
 		 do {
 		 printf (">> ");
 		 fflush(stdin);
@@ -84,5 +84,5 @@ int main()
             fclose(fent);
             return 0;
          }
-     }
+     }*/
 }
