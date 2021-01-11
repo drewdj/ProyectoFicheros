@@ -87,17 +87,7 @@ int main() {
     }*/
     //info(&ext_superblock)
     //Printbytemaps(&ext_bytemaps);
-int p = 0;
-
-
-    for (int k = 0; k < MAX_FICHEROS; ++k) {
-        if ((directorio[k].dir_nfich[0]<90&&directorio[k].dir_nfich[0]>65)||(directorio[k].dir_nfich[0]<122&&directorio[k].dir_nfich[0]>97)){
-            while (directorio[k].dir_nfich[p]!='\0'){
-                printf("%c",directorio[k].dir_nfich[p]);
-                p++;
-            }
-        }
-    }
+    Directorio(directorio,&ext_blq_inodos);
 
     return 0;
 }

@@ -71,3 +71,26 @@ void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps){
         printf(" %d",ext_bytemaps->bmap_bloques[k]);
     }
 }
+
+void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
+    for (int k = 0; k < MAX_FICHEROS; ++k) {
+        int p = 0;
+        if ((directorio[k].dir_nfich[0]<90&&directorio[k].dir_nfich[0]>65)||(directorio[k].dir_nfich[0]<122&&directorio[k].dir_nfich[0]>97)){
+            while (directorio[k].dir_nfich[p]!='\0'){
+                printf("%c",directorio[k].dir_nfich[p]);
+                p++;
+            }
+            printf("    tamano:%d",inodos->blq_inodos[directorio[k].dir_inodo].size_fichero);
+            printf("    inodo:%d",directorio[k].dir_inodo);
+            printf("    bloques:");
+            for (int l = 0; l < sizeof(inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque); ++l) {
+                if (inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]!=65535&&inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]!=0){
+                    printf(" %d",inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]);
+                }
+
+            }
+
+            printf("\n");
+        }
+    }
+}
