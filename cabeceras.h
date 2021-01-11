@@ -59,3 +59,15 @@ void info(EXT_SIMPLE_SUPERBLOCK *extSimpleSuperblock){
     printf("Bloques libres = %d\n",extSimpleSuperblock->s_free_blocks_count);
     printf("Primer bloque de datos = %d\n",extSimpleSuperblock->s_first_data_block);
 }
+
+void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps){
+    printf("Inodos:");
+    for (int k = 0; k <  sizeof(ext_bytemaps->bmap_inodos); ++k) {
+        printf(" %d",ext_bytemaps->bmap_inodos[k]);
+    }
+
+    printf("\nBloques [0-25] :");
+    for (int k = 0; k < 25; ++k) {
+        printf(" %d",ext_bytemaps->bmap_bloques[k]);
+    }
+}
