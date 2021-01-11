@@ -63,9 +63,14 @@ int main()
 		 do {
 		 printf (">> ");
 		 fflush(stdin);
-       gets(comando);
+       fgets(comando, LONGITUD_COMANDO, stdin);
 		} while (ComprobarComando(comando,orden,argumento1,argumento2) != 0);
-      printf("Saliste del bucle"); 
+      ComprobarComando(comando,orden,argumento1,argumento2);
+      printf("%s\n", comando);
+      printf("%s\n", orden);
+      printf("%s\n", argumento1);
+      printf("%s\n", argumento2);
+      int fillVar = 0;
        /*
 	     if (strcmp(orden,"dir")==0) {
             Directorio(&directorio,&ext_blq_inodos);
