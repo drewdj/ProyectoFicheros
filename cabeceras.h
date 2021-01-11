@@ -50,3 +50,12 @@ typedef struct {
 typedef struct{
   unsigned char dato[SIZE_BLOQUE]; 	
 } EXT_DATOS;
+
+void info(EXT_SIMPLE_SUPERBLOCK *extSimpleSuperblock){
+    printf("Bloque %d Bytes\n",extSimpleSuperblock->s_block_size);
+    printf("inodos particion = %d\n",extSimpleSuperblock->s_inodes_count);
+    printf("inodos libres = %d\n",extSimpleSuperblock->s_free_inodes_count);
+    printf("Bloques particion = %d\n",extSimpleSuperblock->s_blocks_count);
+    printf("Bloques libres = %d\n",extSimpleSuperblock->s_free_blocks_count);
+    printf("Primer bloque de datos = %d\n",extSimpleSuperblock->s_first_data_block);
+}
