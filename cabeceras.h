@@ -75,7 +75,7 @@ void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps){
 void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
     for (int k = 0; k < MAX_FICHEROS; ++k) {
         int p = 0;
-        if ((directorio[k].dir_nfich[0]<90&&directorio[k].dir_nfich[0]>65)||(directorio[k].dir_nfich[0]<122&&directorio[k].dir_nfich[0]>97)){
+        if ((directorio[k].dir_nfich[0]<=90&&directorio[k].dir_nfich[0]>=65)||(directorio[k].dir_nfich[0]<=122&&directorio[k].dir_nfich[0]>=**97)){
             while (directorio[k].dir_nfich[p]!='\0'){
                 printf("%c",directorio[k].dir_nfich[p]);
                 p++;
@@ -91,6 +91,33 @@ void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
             }
 
             printf("\n");
+        }
+    }
+}
+
+int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, char *nombreantiguo, char *nombrenuevo){
+
+    for (int i = 0; i < MAX_FICHEROS; ++i) {
+        int stringsize=0;
+        int comparador=0;
+        int k=0;
+        if ((directorio[i].dir_nfich[0]<90&&directorio[i].dir_nfich[0]>65)||(directorio[i].dir_nfich[0]<122&&directorio[i].dir_nfich[0]>97)){
+            while (directorio[i].dir_nfich[k]!='\0'){
+                stringsize++;
+                if (directorio[i].dir_nfich[k]==nombreantiguo[k]){
+                    comparador++;
+                }
+                k++;
+            }
+            if (comparador==stringsize){
+                int p=0;
+                while (nombrenuevo[p]!='\0'){
+                    directorio[i].dir_nfich[p]=nombrenuevo[p];
+                    p++;
+                }
+                directorio[i].dir_nfich[p]='\0';
+            }
+
         }
     }
 }
