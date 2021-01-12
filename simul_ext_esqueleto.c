@@ -28,10 +28,10 @@ void GrabarDatos(EXT_DATOS *memdatos, FILE *fich);
 
 int main()
 {
-	 char *comando[LONGITUD_COMANDO];
-	 char *orden[LONGITUD_COMANDO];
-	 char *argumento1[LONGITUD_COMANDO];
-	 char *argumento2[LONGITUD_COMANDO];
+	 char comando[LONGITUD_COMANDO];
+	 char orden[LONGITUD_COMANDO];
+	 char argumento1[LONGITUD_COMANDO];
+	 char argumento2[LONGITUD_COMANDO];
 	 
 	 int i,j;
 	 unsigned long int m;
@@ -46,9 +46,8 @@ int main()
      FILE *fent;
      
      // Lectura del fichero completo de una sola vez
-
      
-     fent = fopen("particion.bin","r+b");
+     fent = fopen("D:\\Users\\Documents\\GitHub\\ProyectoFicheros\\particion.bin","r+b");
      fread(&datosfich, SIZE_BLOQUE, MAX_BLOQUES_PARTICION, fent);    
      
      
@@ -58,25 +57,45 @@ int main()
      memcpy(&ext_blq_inodos,(EXT_BLQ_INODOS *)&datosfich[2], SIZE_BLOQUE);
      memcpy(&memdatos,(EXT_DATOS *)&datosfich[4],MAX_BLOQUES_DATOS*SIZE_BLOQUE);
      
-     // Buce de tratamiento de comandos
+     // Bucle de tratamiento de comandos
      for (;;){
 		 do {
 		 printf (">> ");
 		 fflush(stdin);
-		 fgets(comando, LONGITUD_COMANDO, stdin);
-		 } while (ComprobarComando(comando,orden,argumento1,argumento2) !=0);
-	     if (strcmp(orden,"dir")==0) {
+       fgets(comando, LONGITUD_COMANDO, stdin);
+		} while (ComprobarComando(comando,orden,argumento1,argumento2) != 0);
+	      if (strcmp(orden,"dir")==0) {
             Directorio(&directorio,&ext_blq_inodos);
             continue;
-            }
-
-         // Escritura de metadatos en comandos rename, remove, copy     
-         Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
-         GrabarByteMaps(&ext_bytemaps,fent);
-         GrabarSuperBloque(&ext_superblock,fent);
-         if (grabardatos)
-           GrabarDatos(&memdatos,fent);
-         grabardatos = 0;
+         }
+         // Escritura de metadatos en comandos rename, remove, copy
+         if(strcmp(orden,"info" == 0)){}
+         if(strcmp(orden,"bytemaps" == 0)){}
+         if(strcmp(orden,"rename" == 0)){
+            Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
+            GrabarByteMaps(&ext_bytemaps,fent);
+            GrabarSuperBloque(&ext_superblock,fent);
+            if (grabardatos)
+               GrabarDatos(&memdatos,fent);
+            grabardatos = 0;
+         }
+         if(strcmp(orden,"imprimir" == 0)){}  
+         if(strcmp(orden,"remove" == 0)){
+            Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
+            GrabarByteMaps(&ext_bytemaps,fent);
+            GrabarSuperBloque(&ext_superblock,fent);
+            if (grabardatos)
+               GrabarDatos(&memdatos,fent);
+            grabardatos = 0;
+         }
+         if(strcmp(orden,"copy" == 0)){
+            Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
+            GrabarByteMaps(&ext_bytemaps,fent);
+            GrabarSuperBloque(&ext_superblock,fent);
+            if (grabardatos)
+               GrabarDatos(&memdatos,fent);
+            grabardatos = 0;
+         }   
          //Si el comando es salir se habrán escrito todos los metadatos
          //faltan los datos y cerrar
          if (strcmp(orden,"salir")==0){
@@ -85,4 +104,75 @@ int main()
             return 0;
          }
      }
+}
+int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2){
+   int flagArg1 = 0;
+   int flagArg2 = 0;
+   int flagArg3 = 0;
+   orden[0] = '\0';
+   argumento1[0] = '\0';
+   argumento2[0] = '\0';
+   int sizeOfComando = 0;
+   int numberOfSpace = 0;
+   while(strcomando[sizeOfComando] != '\0'){
+      if(strcomando[sizeOfComando] == ' '){
+         numberOfSpace++;
+      }
+      sizeOfComando++;
+   }
+   int flag = 0;
+   for(int i = 0; i < sizeOfComando; i++){
+      char filler = strcomando[i];
+      
+      if(filler == ' ' && flag == 0){
+         flag = 1;
+         continue;
+      }
+      else if(filler == ' ' && flag == 1){
+         flag = 2;
+         continue;
+      }
+      else if(flag == 0){
+         strncat(orden, &filler, 1);
+      }
+      else if(flag == 1){
+         strncat(argumento1, &filler, 1);
+      }
+      else if(flag == 2){
+         strncat(argumento2, &filler, 1);
+      }
+      else{
+         break;
+      }
+   }
+   if(argumento2[strlen(argumento2) - 1] == '\n'){
+      argumento2[strlen(argumento2) - 1] = '\0';
+   }
+   if(orden[strlen(orden) - 1] == '\n'){
+      orden[strlen(orden) - 1] = '\0';
+   }
+   if(argumento1[strlen(argumento1) - 1] == '\n'){
+      argumento1[strlen(argumento1) - 1] = '\0';
+   }
+   if(*orden != '\0'){
+      flagArg1 = 1;
+   }
+   if(*argumento1 != '\0'){
+      flagArg2 = 1;
+   }
+   if(*argumento2 != '\0'){
+      flagArg3 = 1;
+   }
+   if(flagArg1 == 1 && numberOfSpace == 0){
+      return 0;
+   }
+   if(flagArg1 == 1 && flagArg2 == 1 && numberOfSpace == 1){
+      return 0;
+   }
+   if(flagArg1 == 1 && flagArg2 == 1 && flagArg3 == 1){
+      return 0;
+   }
+   else {
+      return 1;
+   }
 }
