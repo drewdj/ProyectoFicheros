@@ -87,9 +87,9 @@ int main() {
     }*/
     //info(&ext_superblock)
     //Printbytemaps(&ext_bytemaps);
-    Directorio(directorio,&ext_blq_inodos);
-    Renombrar(directorio,&ext_blq_inodos,"HOLA.txt","Adios.txt");
-    Directorio(directorio,&ext_blq_inodos);
-
+    //irectorio(directorio,&ext_blq_inodos);
+    //Renombrar(directorio,&ext_blq_inodos,"HOLA.txt","Adios.txt");
+    //Directorio(directorio,&ext_blq_inodos);
+    //Imprimir(directorio,&ext_blq_inodos,datosfich,"HOLA.txt")
     return 0;
 }
