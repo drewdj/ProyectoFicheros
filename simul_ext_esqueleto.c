@@ -65,13 +65,6 @@ int main()
 		 fflush(stdin);
        fgets(comando, LONGITUD_COMANDO, stdin);
 		} while (ComprobarComando(comando,orden,argumento1,argumento2) != 0);
-      ComprobarComando(comando,orden,argumento1,argumento2);
-      printf("%s\n", comando);
-      printf("%s\n", orden);
-      printf("%s\n", argumento1);
-      printf("%s\n", argumento2);
-      int fillVar = 0;
-       /*
 	     if (strcmp(orden,"dir")==0) {
             Directorio(&directorio,&ext_blq_inodos);
             continue;
@@ -91,9 +84,8 @@ int main()
             fclose(fent);
             return 0;
          }
-     */}
+     }
 }
-//Corregir esto para que sea paso por referencia
 int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2){
    int flagArg1 = 0;
    int flagArg2 = 0;
@@ -122,17 +114,26 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
          continue;
       }
       else if(flag == 0){
-         strcat(orden, &filler);
+         strncat(orden, &filler, 1);
       }
       else if(flag == 1){
-         strcat(argumento1, &filler);
+         strncat(argumento1, &filler, 1);
       }
       else if(flag == 2){
-         strcat(argumento2, &filler);
+         strncat(argumento2, &filler, 1);
       }
       else{
          break;
       }
+   }
+   if(argumento2[strlen(argumento2) - 1] == '\n'){
+      argumento2[strlen(argumento2) - 1] = '\0';
+   }
+   if(orden[strlen(orden) - 1] == '\n'){
+      orden[strlen(orden) - 1] = '\0';
+   }
+   if(argumento1[strlen(argumento1) - 1] == '\n'){
+      argumento1[strlen(argumento1) - 1] = '\0';
    }
    if(*orden != '\0'){
       flagArg1 = 1;
