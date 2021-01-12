@@ -58,7 +58,7 @@ int main()
      memcpy(&ext_blq_inodos,(EXT_BLQ_INODOS *)&datosfich[2], SIZE_BLOQUE);
      memcpy(&memdatos,(EXT_DATOS *)&datosfich[4],MAX_BLOQUES_DATOS*SIZE_BLOQUE);
      
-     // Buce de tratamiento de comandos
+     // Bucle de tratamiento de comandos
      for (;;){
 		 do {
 		 printf (">> ");
