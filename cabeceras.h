@@ -50,3 +50,113 @@ typedef struct {
 typedef struct{
   unsigned char dato[SIZE_BLOQUE]; 	
 } EXT_DATOS;
+
+void info(EXT_SIMPLE_SUPERBLOCK *extSimpleSuperblock){
+    printf("Bloque %d Bytes\n",extSimpleSuperblock->s_block_size);
+    printf("inodos particion = %d\n",extSimpleSuperblock->s_inodes_count);
+    printf("inodos libres = %d\n",extSimpleSuperblock->s_free_inodes_count);
+    printf("Bloques particion = %d\n",extSimpleSuperblock->s_blocks_count);
+    printf("Bloques libres = %d\n",extSimpleSuperblock->s_free_blocks_count);
+    printf("Primer bloque de datos = %d\n",extSimpleSuperblock->s_first_data_block);
+}
+
+void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps){
+    printf("Inodos:");
+    for (int k = 0; k <  sizeof(ext_bytemaps->bmap_inodos); ++k) {
+        printf(" %d",ext_bytemaps->bmap_inodos[k]);
+    }
+
+    printf("\nBloques [0-25] :");
+    for (int k = 0; k < 25; ++k) {
+        printf(" %d",ext_bytemaps->bmap_bloques[k]);
+    }
+}
+
+void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
+    for (int k = 0; k < MAX_FICHEROS; ++k) {
+        int p = 0;
+        int dirInodo = directorio[k].dir_inodo;
+        if (0<=dirInodo&&dirInodo<=24){//Primero se filtra la direccion de inodo para que entre en el tamaño
+            if (inodos->blq_inodos[dirInodo].size_fichero!=0){//Si el tamaño del fichero es diferente de 0 (no esta vacio) se printea la informacion necesaria
+                while (directorio[k].dir_nfich[p]!='\0'){
+                    printf("%c",directorio[k].dir_nfich[p]);
+                    p++;
+                }
+                printf("    tamano:%d",inodos->blq_inodos[directorio[k].dir_inodo].size_fichero);
+                printf("    inodo:%d",directorio[k].dir_inodo);
+                printf("    bloques:");
+                for (int l = 0; l < sizeof(inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque); ++l) {
+                    if (inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]!=65535&&inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]!=0){
+                        printf(" %d",inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]);
+                    }
+                }
+
+                printf("\n");
+            }
+        }
+
+    }
+
+}
+
+int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, char *nombreantiguo, char *nombrenuevo){
+
+    for (int i = 0; i < MAX_FICHEROS; ++i) {
+        int stringsize=0;
+        int comparador=0;
+        int k=0;
+        int dirInodo = directorio[i].dir_inodo;
+        if (0<dirInodo&&dirInodo<24){//Igual que en directorio
+            if (inodos->blq_inodos[dirInodo].size_fichero!=0){
+                while (directorio[i].dir_nfich[k]!='\0'){//Se compara caracter a caracter nombreantiguo con los nombres en directorio y cuando coincide se sustituye por nombrenuevo
+                    stringsize++;
+                    if (directorio[i].dir_nfich[k]==nombreantiguo[k]){
+                        comparador++;
+                    }
+                    k++;
+                }
+                if (comparador==stringsize){
+                    int p=0;
+                    while (nombrenuevo[p]!='\0'){
+                        directorio[i].dir_nfich[p]=nombrenuevo[p];
+                        p++;
+                    }
+                    directorio[i].dir_nfich[p]='\0';
+                }
+
+            }
+        }
+
+    }
+}
+
+int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_DATOS *memdatos, char *nombre){
+    for (int i = 0; i < MAX_FICHEROS; ++i) {
+        int stringsize=0;
+        int comparador=0;
+        int k=0;
+        int dirInodo = directorio[i].dir_inodo;
+        if (0<dirInodo&&dirInodo<24){//Mismo bucle de busqueda que en renombrar para encontrar el directorio deseado
+            if (inodos->blq_inodos[dirInodo].size_fichero!=0){
+                while (directorio[i].dir_nfich[k]!='\0'){
+                    stringsize++;
+                    if (directorio[i].dir_nfich[k]==nombre[k]){
+                        comparador++;
+                    }
+                    k++;
+                }
+                if (comparador==stringsize){//Una vez encontrado se printean los bloques en el orden deseado
+                    for (int l = 0; l < sizeof(inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque); ++l) {
+                        if (inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=65535&&inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=0){
+                            printf("%s",memdatos[inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]]);
+                        }
+                    }
+                }
+
+            }
+        }
+
+    }
+}
+
+
