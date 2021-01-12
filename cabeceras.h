@@ -61,7 +61,7 @@ void info(EXT_SIMPLE_SUPERBLOCK *extSimpleSuperblock){
 }
 
 void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps){
-    printf("Inodos:");
+    printf("\nInodos:");
     for (int k = 0; k <  sizeof(ext_bytemaps->bmap_inodos); ++k) {
         printf(" %d",ext_bytemaps->bmap_inodos[k]);
     }
@@ -78,6 +78,7 @@ void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
         int dirInodo = directorio[k].dir_inodo;
         if (0<=dirInodo&&dirInodo<=24){//Primero se filtra la direccion de inodo para que entre en el tamaño
             if (inodos->blq_inodos[dirInodo].size_fichero!=0){//Si el tamaño del fichero es diferente de 0 (no esta vacio) se printea la informacion necesaria
+                printf("\n");
                 while (directorio[k].dir_nfich[p]!='\0'){
                     printf("%c",directorio[k].dir_nfich[p]);
                     p++;
@@ -90,8 +91,6 @@ void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
                         printf(" %d",inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]);
                     }
                 }
-
-                printf("\n");
             }
         }
 
@@ -151,6 +150,41 @@ int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_DATOS *mem
                             printf("%s",memdatos[inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]]);
                         }
                     }
+                }
+
+            }
+        }
+
+    }
+}
+int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, char *nombre,  FILE *fich){
+    for (int i = 0; i < MAX_FICHEROS; ++i) {
+        int stringsize=0;
+        int comparador=0;
+        int k=0;
+        int dirInodo = directorio[i].dir_inodo;
+        if (0<dirInodo&&dirInodo<24){//Mismo bucle de busqueda que en renombrar para encontrar el directorio deseado
+            if (inodos->blq_inodos[dirInodo].size_fichero!=0){
+                while (directorio[i].dir_nfich[k]!='\0'){
+                    stringsize++;
+                    if (directorio[i].dir_nfich[k]==nombre[k]){
+                        comparador++;
+                    }
+                    k++;
+                }
+                if (comparador==stringsize){//Una vez encontrado se borra todo su rastro
+                    ext_bytemaps->bmap_inodos[directorio[i].dir_inodo]=0;
+                    for (int l = 0; l < sizeof(inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque); ++l) {
+                        if (inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=65535&&inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=0){
+                            ext_bytemaps->bmap_bloques[inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]]=0;
+                        }
+                    }
+                    inodos->blq_inodos[directorio[i].dir_inodo].size_fichero=0;
+                    for (int j = 0; j < MAX_NUMS_BLOQUE_INODO; ++j) {
+                        inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[j]=0xFFFF;
+                    }
+                    directorio[i].dir_inodo=0xFFFF;
+                    directorio[i].dir_nfich[0]="";
                 }
 
             }
