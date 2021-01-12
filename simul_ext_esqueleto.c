@@ -32,6 +32,10 @@ int main()
 	 char orden[LONGITUD_COMANDO];
 	 char argumento1[LONGITUD_COMANDO];
 	 char argumento2[LONGITUD_COMANDO];
+
+    char *ordenHeap;
+    char *argumento1Heap;
+    char *argumento2Heap;
 	 
 	 int i,j;
 	 unsigned long int m;
@@ -70,7 +74,6 @@ int main()
       printf("%s\n", orden);
       printf("%s\n", argumento1);
       printf("%s\n", argumento2);
-      int fillVar = 0;
        /*
 	     if (strcmp(orden,"dir")==0) {
             Directorio(&directorio,&ext_blq_inodos);
@@ -98,6 +101,10 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
    int flagArg1 = 0;
    int flagArg2 = 0;
    int flagArg3 = 0;
+   int positionOfSpace[] = {0, 0, 0};
+   int sizeOfOrden = 0;
+   int sizeOfArgumento1 = 0;
+   int sizeOfArgumento2 = 0;
    orden[0] = '\0';
    argumento1[0] = '\0';
    argumento2[0] = '\0';
@@ -105,14 +112,39 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
    int numberOfSpace = 0;
    while(strcomando[sizeOfComando] != '\0'){
       if(strcomando[sizeOfComando] == ' '){
+         positionOfSpace[numberOfSpace] = sizeOfComando;
          numberOfSpace++;
       }
       sizeOfComando++;
    }
    int flag = 0;
+/*
+   for(int i = 0; i < sizeOfComando; i++){
+      if(i < positionOfSpace[0] && numberOfSpace == 0){
+         sizeOfOrden++;
+      }
+      if(i < positionOfSpace[1] && i > positionOfSpace[0] && numberOfSpace == 1){
+         sizeOfArgumento1++;
+      }
+      if(i < positionOfSpace[2] && i > positionOfSpace[1] && numberOfSpace == 2){
+         sizeOfArgumento2++;
+      }
+   }*/
+
+   
+
    for(int i = 0; i < sizeOfComando; i++){
       char filler = strcomando[i];
-      
+
+      if(flag == 0){
+         sizeOfOrden++;
+      }
+      if(flag == 1){
+         sizeOfArgumento1++;
+      }
+      if(flag == 2){
+         sizeOfArgumento2++;
+      }
       if(filler == ' ' && flag == 0){
          flag = 1;
          continue;
@@ -130,10 +162,15 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
       else if(flag == 2){
          strcat(argumento2, &filler);
       }
+      else if(filler == '\0'){
+         break;
+      }
       else{
          break;
       }
    }
+
+
    if(*orden != '\0'){
       flagArg1 = 1;
    }
