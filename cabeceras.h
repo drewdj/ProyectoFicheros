@@ -89,7 +89,6 @@ void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
                     if (inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]!=65535&&inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]!=0){
                         printf(" %d",inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]);
                     }
-
                 }
 
                 printf("\n");
@@ -132,5 +131,32 @@ int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, char *nombrea
 }
 
 int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_DATOS *memdatos, char *nombre){
+    for (int i = 0; i < MAX_FICHEROS; ++i) {
+        int stringsize=0;
+        int comparador=0;
+        int k=0;
+        int dirInodo = directorio[i].dir_inodo;
+        if (0<dirInodo&&dirInodo<24){//Mismo bucle de busqueda que en renombrar para encontrar el directorio deseado
+            if (inodos->blq_inodos[dirInodo].size_fichero!=0){
+                while (directorio[i].dir_nfich[k]!='\0'){
+                    stringsize++;
+                    if (directorio[i].dir_nfich[k]==nombre[k]){
+                        comparador++;
+                    }
+                    k++;
+                }
+                if (comparador==stringsize){//Una vez encontrado se printean los bloques en el orden deseado
+                    for (int l = 0; l < sizeof(inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque); ++l) {
+                        if (inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=65535&&inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=0){
+                            printf("%s",memdatos[inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]]);
+                        }
+                    }
+                }
 
+            }
+        }
+
+    }
 }
+
+

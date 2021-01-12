@@ -90,6 +90,12 @@ int main() {
     //irectorio(directorio,&ext_blq_inodos);
     //Renombrar(directorio,&ext_blq_inodos,"HOLA.txt","Adios.txt");
     //Directorio(directorio,&ext_blq_inodos);
-    //Imprimir(directorio,&ext_blq_inodos,datosfich,"HOLA.txt")
+    //Imprimir(directorio,&ext_blq_inodos,datosfich,"BelloGal.txt");
+
+
+
+
+
+
     return 0;
 }
