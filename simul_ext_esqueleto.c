@@ -64,17 +64,38 @@ int main()
 		 fflush(stdin);
        fgets(comando, LONGITUD_COMANDO, stdin);
 		} while (ComprobarComando(comando,orden,argumento1,argumento2) != 0);
-	     if (strcmp(orden,"dir")==0) {
+	      if (strcmp(orden,"dir")==0) {
             Directorio(&directorio,&ext_blq_inodos);
             continue;
-            }
-         // Escritura de metadatos en comandos rename, remove, copy     
-         Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
-         GrabarByteMaps(&ext_bytemaps,fent);
-         GrabarSuperBloque(&ext_superblock,fent);
-         if (grabardatos)
-           GrabarDatos(&memdatos,fent);
-         grabardatos = 0;
+         }
+         // Escritura de metadatos en comandos rename, remove, copy
+         if(strcmp(orden,"info" == 0)){}
+         if(strcmp(orden,"bytemaps" == 0)){}
+         if(strcmp(orden,"rename" == 0)){
+            Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
+            GrabarByteMaps(&ext_bytemaps,fent);
+            GrabarSuperBloque(&ext_superblock,fent);
+            if (grabardatos)
+               GrabarDatos(&memdatos,fent);
+            grabardatos = 0;
+         }
+         if(strcmp(orden,"imprimir" == 0)){}  
+         if(strcmp(orden,"remove" == 0)){
+            Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
+            GrabarByteMaps(&ext_bytemaps,fent);
+            GrabarSuperBloque(&ext_superblock,fent);
+            if (grabardatos)
+               GrabarDatos(&memdatos,fent);
+            grabardatos = 0;
+         }
+         if(strcmp(orden,"copy" == 0)){
+            Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
+            GrabarByteMaps(&ext_bytemaps,fent);
+            GrabarSuperBloque(&ext_superblock,fent);
+            if (grabardatos)
+               GrabarDatos(&memdatos,fent);
+            grabardatos = 0;
+         }   
          //Si el comando es salir se habrán escrito todos los metadatos
          //faltan los datos y cerrar
          if (strcmp(orden,"salir")==0){
