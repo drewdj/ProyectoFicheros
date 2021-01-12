@@ -90,5 +90,6 @@ int main() {
     Directorio(directorio,&ext_blq_inodos);
     Renombrar(directorio,&ext_blq_inodos,"HOLA.txt","Adios.txt");
     Directorio(directorio,&ext_blq_inodos);
+
     return 0;
 }
