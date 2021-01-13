@@ -96,7 +96,7 @@ int main() {
     Printbytemaps(&ext_bytemaps);*/
 
 
-
+    Imprimir(directorio,&ext_blq_inodos,datosfich,"HOLA.txt");
 
 
 

@@ -66,7 +66,7 @@ int main()
        fgets(comando, LONGITUD_COMANDO, stdin);
 		} while (ComprobarComando(comando,orden,argumento1,argumento2) != 0);
 	      if (strcmp(orden,"dir")==0) {
-            Directorio(&directorio,&ext_blq_inodos);
+            Directorio(directorio,&ext_blq_inodos);
             continue;
          }
          // Escritura de metadatos en comandos rename, remove, copy
