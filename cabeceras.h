@@ -1,3 +1,6 @@
+#include<stdio.h>
+#include<string.h>
+#include<ctype.h>
 #define SIZE_BLOQUE 512
 #define MAX_INODOS 24
 #define MAX_FICHEROS 20
@@ -50,6 +53,17 @@ typedef struct {
 typedef struct{
     unsigned char dato[SIZE_BLOQUE];
 } EXT_DATOS;
+
+void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich){
+    EXT_DATOS datostest[MAX_BLOQUES_PARTICION];
+    fseek(fich, SIZE_BLOQUE * 2, SEEK_SET);
+    fwrite(&inodos, SIZE_BLOQUE, 1, fich);
+    fseek(fich, SIZE_BLOQUE * 3, SEEK_SET);
+    fwrite(&directorio, SIZE_BLOQUE, 1, fich);
+    fread(&datostest,SIZE_BLOQUE, MAX_BLOQUES_PARTICION, fich);
+    int i = 0;
+    int c = 0;
+}
 
 void info(EXT_SIMPLE_SUPERBLOCK *extSimpleSuperblock){
     printf("Bloque %d Bytes\n",extSimpleSuperblock->s_block_size);
