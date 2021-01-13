@@ -48,7 +48,7 @@ int main()
      
      // Lectura del fichero completo de una sola vez
      
-     fent = fopen("E:\\Proyecto2_SSOO\\particion.bin","r+b");
+     fent = fopen("D:\\Users\\Documents\\GitHub\\ProyectoFicheros\\particion.bin","r+b");
      fread(&datosfich, SIZE_BLOQUE, MAX_BLOQUES_PARTICION, fent);    
      
      
@@ -57,7 +57,6 @@ int main()
      memcpy(&ext_bytemaps,(EXT_BLQ_INODOS *)&datosfich[1], SIZE_BLOQUE);
      memcpy(&ext_blq_inodos,(EXT_BLQ_INODOS *)&datosfich[2], SIZE_BLOQUE);
      memcpy(&memdatos,(EXT_DATOS *)&datosfich[4],MAX_BLOQUES_DATOS*SIZE_BLOQUE);
-     
      // Bucle de tratamiento de comandos
      for (;;){
 		 do {
@@ -66,17 +65,17 @@ int main()
        fgets(comando, LONGITUD_COMANDO, stdin);
 		} while (ComprobarComando(comando,orden,argumento1,argumento2) != 0);
 	      if (strcmp(orden,"dir")==0) {
-            Directorio(&directorio,&ext_blq_inodos);
+            Directorio(directorio,&ext_blq_inodos);
             continue;
          }
          // Escritura de metadatos en comandos rename, remove, copy
-         if(strcmp(orden,"info") == 0){
+         else if (strcmp(orden,"info") == 0){
              info(&ext_superblock);
          }
-         if(strcmp(orden,"bytemaps") == 0){
+         else if(strcmp(orden,"bytemaps") == 0){
              Printbytemaps(&ext_bytemaps);
          }
-         if(strcmp(orden,"rename") == 0){
+         else if(strcmp(orden,"rename") == 0){
              Renombrar(directorio,&ext_blq_inodos,argumento1,argumento2);
             /*Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
             GrabarByteMaps(&ext_bytemaps,fent);
@@ -85,10 +84,10 @@ int main()
                GrabarDatos(&memdatos,fent);
             grabardatos = 0;*/
          }
-         if(strcmp(orden,"imprimir") == 0){
-             Imprimir(directorio,&ext_blq_inodos,memdatos,argumento1);
+         else if(strcmp(orden,"imprimir") == 0){
+             Imprimir(directorio,&ext_blq_inodos,datosfich,argumento1);
          }
-         if(strcmp(orden,"remove") == 0){
+         else if(strcmp(orden,"remove") == 0){
              Borrar(directorio,&ext_blq_inodos,&ext_bytemaps,&ext_superblock,argumento1,fent);
             /*Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
             GrabarByteMaps(&ext_bytemaps,fent);
@@ -97,7 +96,7 @@ int main()
                GrabarDatos(&memdatos,fent);
             grabardatos = 0;*/
          }
-         if(strcmp(orden,"copy") == 0){
+         else if(strcmp(orden,"copy") == 0){
             Copiar(directorio,&ext_blq_inodos,&ext_bytemaps,&ext_superblock,memdatos,argumento1,argumento2,fent);
             /*Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
             GrabarByteMaps(&ext_bytemaps,fent);
@@ -108,7 +107,7 @@ int main()
          }   
          //Si el comando es salir se habrán escrito todos los metadatos
          //faltan los datos y cerrar
-         if (strcmp(orden,"salir")==0){
+         else if (strcmp(orden,"salir")==0){
             //GrabarDatos(&memdatos,fent);
             fclose(fent);
             return 0;
