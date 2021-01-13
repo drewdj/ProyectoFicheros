@@ -199,6 +199,10 @@ int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich){
     int i = BuscaFich(directorio,inodos,nombreorigen);
     if (i!='\0'){
+        if (BuscaFich(directorio,inodos,nombredestino) != '\0'){
+            printf("\nEl directorio ya existe.");
+            return 0;
+        }
         int p = 0;
         for (int j = 0; j < MAX_INODOS; ++j) {
             if (ext_bytemaps->bmap_inodos[j]==0){
