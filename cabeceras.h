@@ -1,3 +1,6 @@
+#include<stdio.h>
+#include<string.h>
+#include<ctype.h>
 #define SIZE_BLOQUE 512
 #define MAX_INODOS 24
 #define MAX_FICHEROS 20
@@ -50,6 +53,97 @@ typedef struct {
 typedef struct{
     unsigned char dato[SIZE_BLOQUE];
 } EXT_DATOS;
+
+int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2){
+   int flagArg1 = 0;
+   int flagArg2 = 0;
+   int flagArg3 = 0;
+   int positionOfSpace[] = {0, 0, 0};
+   int sizeOfOrden = 0;
+   int sizeOfArgumento1 = 0;
+   int sizeOfArgumento2 = 0;
+   orden[0] = '\0';
+   argumento1[0] = '\0';
+   argumento2[0] = '\0';
+   int sizeOfComando = 0;
+   int numberOfSpace = 0;
+   while(strcomando[sizeOfComando] != '\0'){
+      if(strcomando[sizeOfComando] == ' '){
+         positionOfSpace[numberOfSpace] = sizeOfComando;
+         numberOfSpace++;
+      }
+      sizeOfComando++;
+   }
+   int flag = 0;
+
+   for(int i = 0; i < sizeOfComando; i++){
+      char filler = strcomando[i];
+
+      if(flag == 0){
+         sizeOfOrden++;
+      }
+      if(flag == 1){
+         sizeOfArgumento1++;
+      }
+      if(flag == 2){
+         sizeOfArgumento2++;
+      }
+      if(filler == ' ' && flag == 0){
+         flag = 1;
+         continue;
+      }
+      else if(filler == ' ' && flag == 1){
+         flag = 2;
+         continue;
+      }
+      else if(flag == 0){
+         strncat(orden, &filler, 1);
+      }
+      else if(flag == 1){
+         strncat(argumento1, &filler, 1);
+      }
+      else if(flag == 2){
+         strncat(argumento2, &filler, 1);
+      }
+      else if(filler == '\0'){
+         break;
+      }
+      else{
+         break;
+      }
+   }
+   if(argumento2[strlen(argumento2) - 1] == '\n'){
+      argumento2[strlen(argumento2) - 1] = '\0';
+   }
+   if(orden[strlen(orden) - 1] == '\n'){
+      orden[strlen(orden) - 1] = '\0';
+   }
+   if(argumento1[strlen(argumento1) - 1] == '\n'){
+      argumento1[strlen(argumento1) - 1] = '\0';
+   }
+   if(*orden != '\0'){
+      flagArg1 = 1;
+   }
+   if(*argumento1 != '\0'){
+      flagArg2 = 1;
+   }
+   if(*argumento2 != '\0'){
+      flagArg3 = 1;
+   }
+   if(flagArg1 == 1 && numberOfSpace == 0){
+      return 0;
+   }
+   if(flagArg1 == 1 && flagArg2 == 1 && numberOfSpace == 1){
+      return 0;
+   }
+   if(flagArg1 == 1 && flagArg2 == 1 && flagArg3 == 1){
+      return 0;
+   }
+   else {
+      return 1;
+   }
+}
+
 int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, char *nombre){
     for (int i = 0; i < MAX_FICHEROS; ++i) {
         int stringsize=0;
@@ -73,6 +167,28 @@ int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, char *nombre)
         }
     }
     return '\0';
+}
+
+void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich){
+    fseek(fich, SIZE_BLOQUE * 2, SEEK_SET);
+    fwrite(inodos, SIZE_BLOQUE, 1, fich);
+    fseek(fich, SIZE_BLOQUE * 3, SEEK_SET);
+    fwrite(directorio, SIZE_BLOQUE, 1, fich);
+}
+
+void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich){
+    fseek(fich, SIZE_BLOQUE, SEEK_SET);
+    fwrite(ext_bytemaps, SIZE_BLOQUE, 1, fich);
+}
+
+void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich){
+    fseek(fich, 0, SEEK_SET);
+    fwrite(ext_superblock, SIZE_BLOQUE, 1, fich);
+}
+
+void GrabarDatos(EXT_DATOS *memdatos, FILE *fich){
+    fseek(fich, SIZE_BLOQUE * 4, SEEK_SET);
+    fwrite(memdatos->dato, SIZE_BLOQUE, MAX_BLOQUES_DATOS, fich);
 }
 
 void info(EXT_SIMPLE_SUPERBLOCK *extSimpleSuperblock){
@@ -174,6 +290,10 @@ int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich){
     int i = BuscaFich(directorio,inodos,nombreorigen);
     if (i!='\0'){
+        if (BuscaFich(directorio,inodos,nombredestino) != '\0'){
+            printf("\nEl directorio ya existe.");
+            return 0;
+        }
         int p = 0;
         for (int j = 0; j < MAX_INODOS; ++j) {
             if (ext_bytemaps->bmap_inodos[j]==0){

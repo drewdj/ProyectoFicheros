@@ -4,3 +4,5 @@ simul_ext.exe
 .vscode/tasks.json
 cabeceras.exe
 particion bckp.bin
+particion.bin
+particionTest.bin
