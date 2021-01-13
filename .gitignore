@@ -2,3 +2,7 @@ simul_ext_esqueleto.exe
 simul_ext.exe
 .vscode/launch.json
 .vscode/tasks.json
+/cabeceras.exe
+particion bckp.bin
+particion.bin
+particionTest.bin
