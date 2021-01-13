@@ -79,14 +79,25 @@ int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, char *nombre)
 }
 
 void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich){
-    EXT_DATOS datostest[MAX_BLOQUES_PARTICION];
     fseek(fich, SIZE_BLOQUE * 2, SEEK_SET);
-    fwrite(&inodos, SIZE_BLOQUE, 1, fich);
+    fwrite(inodos, SIZE_BLOQUE, 1, fich);
     fseek(fich, SIZE_BLOQUE * 3, SEEK_SET);
-    fwrite(&directorio, SIZE_BLOQUE, 1, fich);
-    fread(&datostest,SIZE_BLOQUE, MAX_BLOQUES_PARTICION, fich);
-    int i = 0;
-    int c = 0;
+    fwrite(directorio, SIZE_BLOQUE, 1, fich);
+}
+
+void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich){
+    fseek(fich, SIZE_BLOQUE, SEEK_SET);
+    fwrite(ext_bytemaps, SIZE_BLOQUE, 1, fich);
+}
+
+void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich){
+    fseek(fich, 0, SEEK_SET);
+    fwrite(ext_superblock, SIZE_BLOQUE, 1, fich);
+}
+
+void GrabarDatos(EXT_DATOS *memdatos, FILE *fich){
+    fseek(fich, SIZE_BLOQUE * 4, SEEK_SET);
+    fwrite(memdatos->dato, SIZE_BLOQUE, MAX_BLOQUES_DATOS, fich);
 }
 
 void info(EXT_SIMPLE_SUPERBLOCK *extSimpleSuperblock){
