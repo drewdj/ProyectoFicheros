@@ -184,7 +184,42 @@ int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
                         inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[j]=0xFFFF;
                     }
                     directorio[i].dir_inodo=0xFFFF;
-                    directorio[i].dir_nfich[0]="";
+                    directorio[i].dir_nfich[0]='\0';
+                }
+
+            }
+        }
+
+    }
+}
+int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich){
+    for (int i = 0; i < MAX_FICHEROS; ++i) {
+        int stringsize=0;
+        int comparador=0;
+        int k=0;
+        int dirInodo = directorio[i].dir_inodo;
+        if (0<dirInodo&&dirInodo<24){//Mismo bucle de busqueda que en renombrar para encontrar el directorio deseado
+            if (inodos->blq_inodos[dirInodo].size_fichero!=0){
+                while (directorio[i].dir_nfich[k]!='\0'){
+                    stringsize++;
+                    if (directorio[i].dir_nfich[k]==nombreorigen[k]){
+                        comparador++;
+                    }
+                    k++;
+                }
+                if (comparador==stringsize){//UNa vez encontrado
+                    for (int j = 0; j < MAX_INODOS; ++j) {
+                        if (ext_bytemaps->bmap_inodos[j]==0){
+                            ext_bytemaps->bmap_inodos[j]=1;//marca el bytemap
+                            inodos->blq_inodos[j].size_fichero=inodos->blq_inodos[directorio[i].dir_inodo].size_fichero;//asigna mismo tamaño que origen
+                            for (int l = 0; l < MAX_NUMS_BLOQUE_INODO; ++l) {
+                                if (inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=65535&&inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=0){
+
+                                }
+                            }
+                        }
+                        break;
+                    }
                 }
 
             }

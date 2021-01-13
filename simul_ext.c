@@ -85,7 +85,7 @@ int main() {
             return 0;
         }
     }*/
-    //info(&ext_superblock)
+    /*info(&ext_superblock);
     Printbytemaps(&ext_bytemaps);
     Directorio(directorio,&ext_blq_inodos);
     Renombrar(directorio,&ext_blq_inodos,"HOLA.txt","Adios.txt");
@@ -93,7 +93,8 @@ int main() {
     Imprimir(directorio,&ext_blq_inodos,datosfich,"BelloGal.txt");
     Borrar(directorio,&ext_blq_inodos,&ext_bytemaps,&ext_superblock,"HOLA.txt",fent);
     Directorio(directorio,&ext_blq_inodos);
-    Printbytemaps(&ext_bytemaps);
+    Printbytemaps(&ext_bytemaps);*/
+
 
 
 
