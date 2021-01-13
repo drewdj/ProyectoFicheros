@@ -5,6 +5,7 @@
 
 #define LONGITUD_COMANDO 100
 
+void info(EXT_SIMPLE_SUPERBLOCK *extSimpleSuperblock);
 void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps);
 int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2);
 void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup);
@@ -21,10 +22,10 @@ int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
 int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
            EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock,
            EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich);
-void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich);
-void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich);
-void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich);
-void GrabarDatos(EXT_DATOS *memdatos, FILE *fich);
+//void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich);
+//void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich);
+//void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich);
+//void GrabarDatos(EXT_DATOS *memdatos, FILE *fich);
 
 int main()
 {
@@ -50,7 +51,6 @@ int main()
      FILE *fent;
      
      // Lectura del fichero completo de una sola vez
-     //...
      
      fent = fopen("D:\\Users\\Documents\\GitHub\\ProyectoFicheros\\particion.bin","r+b");
      fread(&datosfich, SIZE_BLOQUE, MAX_BLOQUES_PARTICION, fent);    
@@ -61,42 +61,65 @@ int main()
      memcpy(&ext_bytemaps,(EXT_BLQ_INODOS *)&datosfich[1], SIZE_BLOQUE);
      memcpy(&ext_blq_inodos,(EXT_BLQ_INODOS *)&datosfich[2], SIZE_BLOQUE);
      memcpy(&memdatos,(EXT_DATOS *)&datosfich[4],MAX_BLOQUES_DATOS*SIZE_BLOQUE);
-     
-     // Buce de tratamiento de comandos
+     // Bucle de tratamiento de comandos
      for (;;){
 		 do {
-		 printf (">> ");
+		 printf ("\n>> ");
 		 fflush(stdin);
        fgets(comando, LONGITUD_COMANDO, stdin);
 		} while (ComprobarComando(comando,orden,argumento1,argumento2) != 0);
-      ComprobarComando(comando,orden,argumento1,argumento2);
-      printf("%s\n", comando);
-      printf("%s\n", orden);
-      printf("%s\n", argumento1);
-      printf("%s\n", argumento2);
-       /*
-	     if (strcmp(orden,"dir")==0) {
-            Directorio(&directorio,&ext_blq_inodos);
+	      if (strcmp(orden,"dir")==0) {
+            Directorio(directorio,&ext_blq_inodos);
             continue;
-            }
-         //...
-         // Escritura de metadatos en comandos rename, remove, copy     
-         Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
-         GrabarByteMaps(&ext_bytemaps,fent);
-         GrabarSuperBloque(&ext_superblock,fent);
-         if (grabardatos)
-           GrabarDatos(&memdatos,fent);
-         grabardatos = 0;
+         }
+         // Escritura de metadatos en comandos rename, remove, copy
+         else if (strcmp(orden,"info") == 0){
+             info(&ext_superblock);
+         }
+         else if(strcmp(orden,"bytemaps") == 0){
+             Printbytemaps(&ext_bytemaps);
+         }
+         else if(strcmp(orden,"rename") == 0){
+             Renombrar(directorio,&ext_blq_inodos,argumento1,argumento2);
+            /*Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
+            GrabarByteMaps(&ext_bytemaps,fent);
+            GrabarSuperBloque(&ext_superblock,fent);
+            if (grabardatos)
+               GrabarDatos(&memdatos,fent);
+            grabardatos = 0;*/
+         }
+         else if(strcmp(orden,"imprimir") == 0){
+             Imprimir(directorio,&ext_blq_inodos,datosfich,argumento1);
+         }
+         else if(strcmp(orden,"remove") == 0){
+             Borrar(directorio,&ext_blq_inodos,&ext_bytemaps,&ext_superblock,argumento1,fent);
+            /*Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
+            GrabarByteMaps(&ext_bytemaps,fent);
+            GrabarSuperBloque(&ext_superblock,fent);
+            if (grabardatos)
+               GrabarDatos(&memdatos,fent);
+            grabardatos = 0;*/
+         }
+         else if(strcmp(orden,"copy") == 0){
+            Copiar(directorio,&ext_blq_inodos,&ext_bytemaps,&ext_superblock,memdatos,argumento1,argumento2,fent);
+            /*Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
+            GrabarByteMaps(&ext_bytemaps,fent);
+            GrabarSuperBloque(&ext_superblock,fent);
+            if (grabardatos)
+               GrabarDatos(&memdatos,fent);
+            grabardatos = 0;*/
+         }   
          //Si el comando es salir se habrán escrito todos los metadatos
          //faltan los datos y cerrar
-         if (strcmp(orden,"salir")==0){
-            GrabarDatos(&memdatos,fent);
+         else if (strcmp(orden,"salir")==0){
+            //GrabarDatos(&memdatos,fent);
             fclose(fent);
             return 0;
+         } else{
+             printf("ERROR: Comando ilegal [bytemaps,copy,dir,info,imprimir,rename,remove,salir]\n");
          }
-     */}
+     }
 }
-//Corregir esto para que sea paso por referencia
 int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2){
    int flagArg1 = 0;
    int flagArg2 = 0;
@@ -154,13 +177,13 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
          continue;
       }
       else if(flag == 0){
-         strcat(orden, &filler);
+         strncat(orden, &filler, 1);
       }
       else if(flag == 1){
-         strcat(argumento1, &filler);
+         strncat(argumento1, &filler, 1);
       }
       else if(flag == 2){
-         strcat(argumento2, &filler);
+         strncat(argumento2, &filler, 1);
       }
       else if(filler == '\0'){
          break;
@@ -169,8 +192,15 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
          break;
       }
    }
-
-
+   if(argumento2[strlen(argumento2) - 1] == '\n'){
+      argumento2[strlen(argumento2) - 1] = '\0';
+   }
+   if(orden[strlen(orden) - 1] == '\n'){
+      orden[strlen(orden) - 1] = '\0';
+   }
+   if(argumento1[strlen(argumento1) - 1] == '\n'){
+      argumento1[strlen(argumento1) - 1] = '\0';
+   }
    if(*orden != '\0'){
       flagArg1 = 1;
    }
