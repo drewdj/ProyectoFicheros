@@ -53,6 +53,30 @@ typedef struct {
 typedef struct{
     unsigned char dato[SIZE_BLOQUE];
 } EXT_DATOS;
+int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, char *nombre){
+    for (int i = 0; i < MAX_FICHEROS; ++i) {
+        int stringsize=0;
+        int comparador=0;
+        int k=0;
+        int dirInodo = directorio[i].dir_inodo;
+        if (0<dirInodo&&dirInodo<24){//Mismo bucle de busqueda que en renombrar para encontrar el directorio deseado
+            if (inodos->blq_inodos[dirInodo].size_fichero!=0){
+                while (directorio[i].dir_nfich[k]!='\0'){
+                    stringsize++;
+                    if (directorio[i].dir_nfich[k]==nombre[k]){
+                        comparador++;
+                    }
+                    k++;
+                }
+                if (comparador==stringsize){//Una vez encontrado se borra todo su rastro
+                    return i;
+                }
+
+            }
+        }
+    }
+    return '\0';
+}
 
 void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich){
     EXT_DATOS datostest[MAX_BLOQUES_PARTICION];
@@ -100,8 +124,8 @@ void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
                 printf("    tamano:%d",inodos->blq_inodos[directorio[k].dir_inodo].size_fichero);
                 printf("    inodo:%d",directorio[k].dir_inodo);
                 printf("    bloques:");
-                for (int l = 0; l < sizeof(inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque); ++l) {
-                    if (inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]!=65535&&inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]!=0){
+                for (int l = 0; l < MAX_NUMS_BLOQUE_INODO; ++l) {
+                    if (inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]!=NULL_BLOQUE&&inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]!=0){
                         printf(" %d",inodos->blq_inodos[directorio[k].dir_inodo].i_nbloque[l]);
                     }
                 }
@@ -113,133 +137,94 @@ void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos){
 }
 
 int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, char *nombreantiguo, char *nombrenuevo){
-
-    for (int i = 0; i < MAX_FICHEROS; ++i) {
-        int stringsize=0;
-        int comparador=0;
-        int k=0;
-        int dirInodo = directorio[i].dir_inodo;
-        if (0<dirInodo&&dirInodo<24){//Igual que en directorio
-            if (inodos->blq_inodos[dirInodo].size_fichero!=0){
-                while (directorio[i].dir_nfich[k]!='\0'){//Se compara caracter a caracter nombreantiguo con los nombres en directorio y cuando coincide se sustituye por nombrenuevo
-                    stringsize++;
-                    if (directorio[i].dir_nfich[k]==nombreantiguo[k]){
-                        comparador++;
-                    }
-                    k++;
-                }
-                if (comparador==stringsize){
-                    int p=0;
-                    while (nombrenuevo[p]!='\0'){
-                        directorio[i].dir_nfich[p]=nombrenuevo[p];
-                        p++;
-                    }
-                    directorio[i].dir_nfich[p]='\0';
-                }
-
-            }
+    int i = BuscaFich(directorio,inodos,nombreantiguo );
+    if (i!='\0'){
+        int p=0;
+        while (nombrenuevo[p]!='\0'){
+            directorio[i].dir_nfich[p]=nombrenuevo[p];
+            p++;
         }
-
-    }
+        directorio[i].dir_nfich[p]='\0';
+    } else
+        printf("Directorio no encontrado.");
+    return 0;
 }
 
 int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_DATOS *memdatos, char *nombre){
-    for (int i = 0; i < MAX_FICHEROS; ++i) {
-        int stringsize=0;
-        int comparador=0;
-        int k=0;
-        int dirInodo = directorio[i].dir_inodo;
-        if (0<dirInodo&&dirInodo<24){//Mismo bucle de busqueda que en renombrar para encontrar el directorio deseado
-            if (inodos->blq_inodos[dirInodo].size_fichero!=0){
-                while (directorio[i].dir_nfich[k]!='\0'){
-                    stringsize++;
-                    if (directorio[i].dir_nfich[k]==nombre[k]){
-                        comparador++;
-                    }
-                    k++;
-                }
-                if (comparador==stringsize){//Una vez encontrado se printean los bloques en el orden deseado
-                    for (int l = 0; l < sizeof(inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque); ++l) {
-                        if (inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=65535&&inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=0){
-                            printf("%s",memdatos[inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]]);
-                        }
-                    }
-                }
-
+    int i = BuscaFich(directorio,inodos,nombre);
+    if (i!='\0'){
+        for (int l = 0; l < sizeof(inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque); ++l) {
+            if (inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=NULL_BLOQUE&&inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=0){
+                printf("%s",memdatos[inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]-4]);
             }
         }
 
-    }
+    } else
+        printf("Directorio no encontrado.");
+    return 0;
 }
+
 int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, char *nombre,  FILE *fich){
-    for (int i = 0; i < MAX_FICHEROS; ++i) {
-        int stringsize=0;
-        int comparador=0;
-        int k=0;
-        int dirInodo = directorio[i].dir_inodo;
-        if (0<dirInodo&&dirInodo<24){//Mismo bucle de busqueda que en renombrar para encontrar el directorio deseado
-            if (inodos->blq_inodos[dirInodo].size_fichero!=0){
-                while (directorio[i].dir_nfich[k]!='\0'){
-                    stringsize++;
-                    if (directorio[i].dir_nfich[k]==nombre[k]){
-                        comparador++;
-                    }
-                    k++;
-                }
-                if (comparador==stringsize){//Una vez encontrado se borra todo su rastro
-                    ext_bytemaps->bmap_inodos[directorio[i].dir_inodo]=0;
-                    for (int l = 0; l < sizeof(inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque); ++l) {
-                        if (inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=65535&&inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=0){
-                            ext_bytemaps->bmap_bloques[inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]]=0;
-                        }
-                    }
-                    inodos->blq_inodos[directorio[i].dir_inodo].size_fichero=0;
-                    for (int j = 0; j < MAX_NUMS_BLOQUE_INODO; ++j) {
-                        inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[j]=0xFFFF;
-                    }
-                    directorio[i].dir_inodo=0xFFFF;
-                    directorio[i].dir_nfich[0]='\0';
-                }
-
+    int i = BuscaFich(directorio,inodos,nombre);
+    if (i!='\0'){
+        ext_bytemaps->bmap_inodos[directorio[i].dir_inodo]=0;
+        for (int l = 0; l < sizeof(inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque); ++l) {
+            if (inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=NULL_BLOQUE&&inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=0){
+                ext_bytemaps->bmap_bloques[inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]]=0;
             }
         }
+        inodos->blq_inodos[directorio[i].dir_inodo].size_fichero=0;
+        for (int j = 0; j < MAX_NUMS_BLOQUE_INODO; ++j) {
+            inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[j]=NULL_BLOQUE;
+        }
+        directorio[i].dir_inodo=0xFFFF;
+        directorio[i].dir_nfich[0]='\0';
+    } else
+        printf("Directorio no encontrado.");
 
-    }
+    return 0;
 }
-int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich){
-    for (int i = 0; i < MAX_FICHEROS; ++i) {
-        int stringsize=0;
-        int comparador=0;
-        int k=0;
-        int dirInodo = directorio[i].dir_inodo;
-        if (0<dirInodo&&dirInodo<24){//Mismo bucle de busqueda que en renombrar para encontrar el directorio deseado
-            if (inodos->blq_inodos[dirInodo].size_fichero!=0){
-                while (directorio[i].dir_nfich[k]!='\0'){
-                    stringsize++;
-                    if (directorio[i].dir_nfich[k]==nombreorigen[k]){
-                        comparador++;
-                    }
-                    k++;
-                }
-                if (comparador==stringsize){//UNa vez encontrado
-                    for (int j = 0; j < MAX_INODOS; ++j) {
-                        if (ext_bytemaps->bmap_inodos[j]==0){
-                            ext_bytemaps->bmap_inodos[j]=1;//marca el bytemap
-                            inodos->blq_inodos[j].size_fichero=inodos->blq_inodos[directorio[i].dir_inodo].size_fichero;//asigna mismo tamaño que origen
-                            for (int l = 0; l < MAX_NUMS_BLOQUE_INODO; ++l) {
-                                if (inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=65535&&inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=0){
 
-                                }
+int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich){
+    int i = BuscaFich(directorio,inodos,nombreorigen);
+    if (i!='\0'){
+        int p = 0;
+        for (int j = 0; j < MAX_INODOS; ++j) {
+            if (ext_bytemaps->bmap_inodos[j]==0){
+                ext_bytemaps->bmap_inodos[j]=1;//marca el bytemap
+                inodos->blq_inodos[j].size_fichero=inodos->blq_inodos[directorio[i].dir_inodo].size_fichero;//asigna mismo tamaño que origen
+                for (int l = 0; l < MAX_NUMS_BLOQUE_INODO; ++l) {
+                    if (inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=65535&&inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[l]!=0){
+                        for (int m = 0; m < MAX_BLOQUES_DATOS; ++m) {//asignar bloques
+                            if (ext_bytemaps->bmap_bloques[m]==0){
+                                ext_bytemaps->bmap_bloques[m]=1;
+                                memdatos[m-4]=memdatos[l-4];
+                                inodos->blq_inodos[j].i_nbloque[p]=m;
+                                p++;
+                                break;
+
                             }
                         }
+                    }
+                }
+                for (int l = 0; l < MAX_FICHEROS; ++l) {
+                    if (directorio[l].dir_inodo==0xFFFF){
+                        int m=0;
+                        for (; m < strlen(nombredestino); ++m) {
+                            directorio[l].dir_nfich[m]=nombredestino[m];
+                        }
+                        directorio[l].dir_nfich[m]='\0';
+                        directorio[l].dir_inodo=j;
                         break;
                     }
                 }
-
+                break;
             }
         }
-
-    }
+    } else
+        printf("Directorio no encontrado.");
+    return 0;
 }
+
 
 
