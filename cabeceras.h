@@ -55,9 +55,11 @@ typedef struct{
 } EXT_DATOS;
 
 int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2){
+   //Flagas para saber si existen los tres argumentos
    int flagArg1 = 0;
    int flagArg2 = 0;
    int flagArg3 = 0;
+   //Array para saber donde estan los espacios, para colocar '\0'
    int positionOfSpace[] = {0, 0, 0};
    int sizeOfOrden = 0;
    int sizeOfArgumento1 = 0;
@@ -67,6 +69,7 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
    argumento2[0] = '\0';
    int sizeOfComando = 0;
    int numberOfSpace = 0;
+   //Contar el numero de espacios y guardar su posicion
    while(strcomando[sizeOfComando] != '\0'){
       if(strcomando[sizeOfComando] == ' '){
          positionOfSpace[numberOfSpace] = sizeOfComando;
@@ -75,7 +78,7 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
       sizeOfComando++;
    }
    int flag = 0;
-
+    //Bucle para meter caracter a caracter Orden Argumento1 y Argumento2
    for(int i = 0; i < sizeOfComando; i++){
       char filler = strcomando[i];
 
@@ -112,6 +115,7 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
          break;
       }
    }
+   //Si el ultimo caracter de algun argumento es un \n cambiarlo por un '\0'
    if(argumento2[strlen(argumento2) - 1] == '\n'){
       argumento2[strlen(argumento2) - 1] = '\0';
    }
@@ -121,6 +125,7 @@ int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argu
    if(argumento1[strlen(argumento1) - 1] == '\n'){
       argumento1[strlen(argumento1) - 1] = '\0';
    }
+   //Comprobar el numero de argumentos y devolver el resultado de la comprobacion
    if(*orden != '\0'){
       flagArg1 = 1;
    }
@@ -169,6 +174,8 @@ int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, char *nombre)
     return '\0';
 }
 
+//A continuacion hay 4 funciones para grabar los cambios, que buscan con fseek donde se deben de colocar los punteros para empezar a escribir los bloques
+//y posteriormente sobreescriben lo que estan en esa posicion dentro del archivo fich
 void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich){
     fseek(fich, SIZE_BLOQUE * 2, SEEK_SET);
     fwrite(inodos, SIZE_BLOQUE, 1, fich);
