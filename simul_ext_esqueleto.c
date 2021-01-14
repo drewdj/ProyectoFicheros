@@ -42,10 +42,26 @@ int main()
      int entradadir;
      int grabardatos;
      FILE *fent;
+   
+   //Comprobar existencia del fichero
 
-     // Lectura del fichero completo de una sola vez
+   int FileExt = 0;
+   
+   if(fent = fopen("particion.bin","rb")){
+      fclose(fent);
+      FileExt = 1;
+   }
 
-     fent = fopen("D:\\Users\\Documents\\GitHub\\ProyectoFicheros\\particion.bin","r+b");
+   else if(FileExt == 0){
+      fclose(fent);
+      char fill[LONGITUD_COMANDO];
+      printf("No existe el fichero particion.bin,\nPulse 'Enter' para terminar el programa\n");
+      gets(fill);
+      return 0;
+   }
+   // Lectura del fichero completo de una sola vez
+
+     fent = fopen("particion.bin","r+b");
      fread(&datosfich, SIZE_BLOQUE, MAX_BLOQUES_PARTICION, fent);
 
      memcpy(&ext_superblock,(EXT_SIMPLE_SUPERBLOCK *)&datosfich[0], SIZE_BLOQUE);
@@ -107,7 +123,8 @@ int main()
             GrabarDatos(memdatos,fent);
             fclose(fent);
             return 0;
-         } else{
+         } 
+         else{
              printf("ERROR: Comando ilegal [bytemaps,copy,dir,info,imprimir,rename,remove,salir]\n");
          }
      }
